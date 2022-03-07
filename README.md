@@ -64,7 +64,7 @@ req := &Request{
 }
 ```
 
-The response type, `GetCapabilitiesResponse` does not have any prefixes:
+The response type, `GetCapabilitiesResponse`, does not have any prefixes:
 
 ```go
 // GetCapabilitiesResponse is an ONVIF GetServicesResponse response
