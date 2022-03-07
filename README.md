@@ -8,7 +8,7 @@ This library is mostly a small SOAP wrapper built on top of net/http.Client with
 
 It's not a project goal to have pre-built types for all the ONVIF types; instead the user should construct the types they need ([gowsdl](https://github.com/hooklift/gowsdl) can be a useful tool to do that).
 
-[pkg.go.dev has a full example](https://pkg.go.dev/github.com/korylprince/go-onvif#pkg-examples).
+[pkg.go.dev has a full example](https://pkg.go.dev/github.com/korylprince/go-onvif#example-package).
 
 ## API Stability
 
@@ -40,7 +40,7 @@ if mediaURL == "" {
 
 Next you can create an `onvif.Request` using the namespace, URL, and an ONVIF request type (see Creating Types section below), and execute it with `onvif.client.Do`. The response body can be Unmarshaled into an ONVIF response type (see Creating Types section below) with `soap.Body.Unmarshal`.
 
-See a full example on [pkg.go.dev](https://pkg.go.dev/github.com/korylprince/go-onvif#pkg-examples).
+See a full example on [pkg.go.dev](https://pkg.go.dev/github.com/korylprince/go-onvif#example-package).
 
 # Creating Types
 
