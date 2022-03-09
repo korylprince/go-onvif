@@ -85,7 +85,7 @@ func (c *Client) GetServices(addr string) (Services, error) {
 	if err != nil {
 		// if GetServices isn't implemented, try GetCapabilities
 		if f, ok := err.(*soap.Fault); ok {
-			if strings.ToLower(f.Reason) == "unknown action" || strings.ToLower(f.Reason) == "optional action not implemented" {
+			if strings.Contains(strings.ToLower(f.Reason), "unknown action") || strings.Contains(strings.ToLower(f.Reason), "not implemented") {
 				services, err := c.GetCapabilities(addr)
 				if err != nil {
 					return nil, fmt.Errorf("could not get services via GetServices or GetCapabilities: %w", err)
@@ -133,7 +133,7 @@ func (c *Client) GetCapabilities(addr string) (Services, error) {
 	req := &Request{
 		URL:        fmt.Sprintf("http://%s/onvif/device_service", addr),
 		Namespaces: soap.Namespaces{"tds": NamespaceDevice},
-		Body:       &GetServices{IncludeCapability: false},
+		Body:       &GetCapabilities{Category: "All"},
 	}
 	env, err := c.Do(req)
 	if err != nil {
