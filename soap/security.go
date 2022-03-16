@@ -57,7 +57,7 @@ type Nonce struct {
 // UsernameToken is a SOAP username token
 type UsernameToken struct {
 	XMLName  xml.Name `xml:"wsse:UsernameToken"`
-	Username string
+	Username string   `xml:"wsse:Username"`
 	Password *Password
 	Nonce    *Nonce
 	Created  string `xml:"wsu:Created"`
@@ -69,7 +69,7 @@ func NewSecurity(username, password string) (*Security, error) {
 	if _, err := rand.Read(nonce); err != nil {
 		return nil, fmt.Errorf("could not generate nonce: %w", err)
 	}
-	created := time.Now().UTC().Format(time.RFC3339Nano)
+	created := time.Now().UTC().Format("2006-01-02T15:04:05")
 
 	hash := sha1.New()
 	hash.Write(nonce)
