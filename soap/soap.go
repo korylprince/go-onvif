@@ -14,6 +14,8 @@ const (
 
 	NamspaceWSSSecExt   = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"
 	NamespaceWSSUtility = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+
+	NamespaceONVIFError = "http://www.onvif.org/ver10/error"
 )
 
 // ErrNoResponse indicates a SOAP response was not returned
@@ -99,8 +101,8 @@ func (e *Envelope) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		e.Namespaces = make(Namespaces)
 	}
 	for _, attr := range start.Attr {
-		if name := strings.ToLower(attr.Name.Local); strings.HasPrefix(name, "xmlns:") {
-			e.Namespaces[name] = attr.Value
+		if strings.ToLower(attr.Name.Space) == "xmlns" {
+			e.Namespaces[attr.Name.Local] = attr.Value
 		}
 	}
 
@@ -129,6 +131,9 @@ func (e *Envelope) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 					return fmt.Errorf("could not decode body: %w", err)
 				}
 				e.Body = b
+				if e.Body.Fault != nil {
+					e.Body.Fault.Namespaces = e.Namespaces
+				}
 			} else {
 				return UnexpectedTokenError(t.Name)
 			}
@@ -157,13 +162,14 @@ type header struct {
 
 // Fault is a SOAP message error
 type Fault struct {
-	XMLName xml.Name `xml:"Fault"`
-	Code    string   `xml:"Code>Value"`
-	SubCode string   `xml:"Code>Subcode"`
-	Reason  string   `xml:"Reason>Text"`
-	Node    string
-	Role    string
-	Detail  []byte `xml:",innerxml"`
+	Namespaces map[string]string `xml:"-"`
+	XMLName    xml.Name          `xml:"Fault"`
+	Code       string            `xml:"Code>Value"`
+	SubCode    string            `xml:"Code>Subcode>Value"`
+	Reason     string            `xml:"Reason>Text"`
+	Node       string
+	Role       string
+	Detail     []byte `xml:",innerxml"`
 }
 
 func (f *Fault) Error() string {
@@ -180,6 +186,20 @@ func (f *Fault) Error() string {
 	}
 
 	return fmt.Sprintf("SOAP fault%s: %s", c, f.Reason)
+}
+
+// IsUnauthorizedError returns true if the fault indicates an authorization error
+func (f *Fault) IsUnauthorizedError() bool {
+	soapPrefix := ""
+	errPrefix := ""
+	for prefix, ns := range f.Namespaces {
+		if ns == NamespaceEnvelope {
+			soapPrefix = prefix + ":"
+		} else if ns == NamespaceONVIFError {
+			errPrefix = prefix + ":"
+		}
+	}
+	return f.Code == soapPrefix+"Sender" && f.SubCode == errPrefix+"NotAuthorized"
 }
 
 // Body is a SOAP message body

@@ -54,7 +54,7 @@ type GetVideoSourceModesResponse struct {
 
 // Example of getting all video modes from a camera
 func Example() {
-	c := &onvif.Client{}
+	c := &onvif.Client{Username: "admin", Password: "12345"}
 	services, err := c.GetServices("192.168.0.64:80")
 	if err != nil {
 		// handle err
@@ -76,9 +76,6 @@ func Example() {
 		// handle media service not supported
 		panic("media service not supported")
 	}
-
-	c.Username = "admin"
-	c.Password = "12345"
 
 	r := &onvif.Request{
 		URL:        mediaURL,
