@@ -10,6 +10,7 @@ import (
 
 // ONVIF Namespaces
 const (
+	NamespaceONVIF  = "http://www.onvif.org/ver10/schema"
 	NamespaceDevice = "http://www.onvif.org/ver10/device/wsdl"
 	NamespaceEvents = "http://www.onvif.org/ver10/events/wsdl"
 
