@@ -169,7 +169,9 @@ type Fault struct {
 	Reason     string            `xml:"Reason>Text"`
 	Node       string
 	Role       string
-	Detail     []byte `xml:",innerxml"`
+	Detail     struct {
+		InnerXML []byte `xml:",innerxml"`
+	}
 }
 
 func (f *Fault) Error() string {
